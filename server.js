@@ -16,7 +16,8 @@ app.use(express.static(distDir));
 var db;
 
 // Connect to the database before starting the application server.
-mongodb.MongoClient.connect(process.env.MONGODB_URI, function (err, database) {
+//mongodb.MongoClient.connect(process.env.MONGODB_URI, function (err, database) {
+mongodb.MongoClient.connect('mongodb://localhost:27017/contacts', function (err, database) {
   if (err) {
     console.log(err);
     process.exit(1);
@@ -41,10 +42,7 @@ function handleError(res, reason, message, code) {
   res.status(code || 500).json({"error": message});
 }
 
-/*  "/api/contacts"
- *    GET: finds all contacts
- *    POST: creates a new contact
- */
+// --------------------------------------------------------------
 
 app.get("/api/contacts", function(req, res) {
   db.collection(CONTACTS_COLLECTION).find({}).toArray(function(err, docs) {
@@ -72,12 +70,6 @@ app.post("/api/contacts", function(req, res) {
     }
   });
 });
-
-/*  "/api/contacts/:id"
- *    GET: find contact by id
- *    PUT: update contact by id
- *    DELETE: deletes contact by id
- */
 
 app.get("/api/contacts/:id", function(req, res) {
   db.collection(CONTACTS_COLLECTION).findOne({ _id: new ObjectID(req.params.id) }, function(err, doc) {
@@ -111,4 +103,12 @@ app.delete("/api/contacts/:id", function(req, res) {
       res.status(200).json(req.params.id);
     }
   });
+});
+
+// --------------------------------------------------------------
+
+app.get('*', function(req, res) {
+    var result = 'App is running';
+    //response.send('');
+    res.sendfile('./dist/index.html'); 
 });
